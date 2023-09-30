@@ -535,6 +535,35 @@ Also the old good Plex Home Theater is still available, in an open source versio
 
 Personal choice: after using OpenPHT for a while I'll give Plex Media Player a try. I might miss the ability to live-edit subtitle offset, but Bazarr is supposed to do its job. We'll see.
 
+#### Setting up custom certificate for plex
+
+> This was inspired by https://erik.ellsinger.me/how-to-use-a-custom-certificate-with-plex/
+
+If you're using tailscale like I am, you can get use Tailscale Magic DNS and Let's Encrypt to directly access your plex server through Tailscale with https.
+
+1. Fetch your Tailscale magic dns certificates
+
+```bash
+sudo tailscale cert <magic dns name of machine>
+```
+
+2. Generate a pkcs12 format file for Plex
+```bash
+sudo openssl pkcs12 -export -passout pass: -out keyStore.p12 -certpbe AES-256-CBC -keypbe AES-256-CBC -macalg SHA256 -inkey <magic dns name of machine>.key -in <magic dns name of machine>.crt
+```
+
+3. Copy the new `.p12` file into your plex config
+```bash
+sudo cp keyStore.12 <ROOT>/plex/db/Library/Application Support/Plex Media Server
+```
+
+4. Within the Plex interface, go to `Settings` > `Network` > `Custom certificate location` and put in the path relative to the container.
+
+For example, mine would be 
+```bash
+/config/Library/Application Support/Plex Media Server/keyStore.p12
+```
+
 ### Setup Sonarr
 
 #### Docker container
